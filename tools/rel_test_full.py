@@ -30,7 +30,8 @@ dir_name = save_work_dir.split('/')[-1]
 ps_type = dir_name.split('_')[1]
 model_name = dir_name.split('_')[2]
 
-model_pth = f'epoch_{args.epoch_id}.pth'
+# model_pth = f'epoch_{args.epoch_id}.pth'
+model_pth = "latest.pth"
 mark = f'{dir_name}_standard'
 
 mark = model_name + '_' + mark + '_' + model_pth.split('.')[0]

@@ -22,7 +22,8 @@ class PVSGRelationDataset:
             anno = json.load(f)
 
         self.video_ids = []
-        for data_source in ['vidor', 'epic_kitchen', 'ego4d']:
+        # for data_source in ['vidor', 'epic_kitchen', 'ego4d']:
+        for data_source in ['vidor', 'ego4d']:
             for video_id in anno['split'][data_source][split]:
                 self.video_ids.append(video_id)
 

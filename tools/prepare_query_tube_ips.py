@@ -2,6 +2,10 @@
 # Copy and modified from mmdet@3b72b12
 # No other change to mmdet@3b72b12 except for:
 # HY : custom import
+# import gc, scripts for preventing RAM leaks, OOM (suggested by Gemini)
+
+import gc
+
 import argparse
 import os
 import os.path as osp
@@ -25,8 +29,8 @@ from mmdet.utils import (build_ddp, build_dp, compat_cfg, get_device,
                          update_data_root)
 
 from datasets.datasets.builder import build_dataset
-import models  # noqa: F401
-import datasets  # noqa: F401
+# import models  # noqa: F401
+# import datasets  # noqa: F401
 from models.unitrack.test_mots_from_mask2former import eval_seq
 
 
@@ -185,8 +189,10 @@ def main():
         distributed = True
         init_dist(args.launcher, **cfg.dist_params)
 
+    # set workers_per_gpu=0 to avoid RAM issue (suggested by Gemini)
     test_dataloader_default_args = dict(samples_per_gpu=1,
-                                        workers_per_gpu=2,
+                                        # workers_per_gpu=2,
+                                        workers_per_gpu=0,
                                         dist=distributed,
                                         shuffle=False)
 
@@ -232,9 +238,13 @@ def main():
     with open(pvsg_json, 'r') as f:
         anno = json.load(f)
     video_names = []
-    for data_source in ['vidor', 'epic_kitchen', 'ego4d']:
+    # for data_source in ['vidor', 'epic_kitchen', 'ego4d']:
+    for data_source in ['vidor', 'ego4d']:
         for video_id in anno['split'][data_source][split]:
             video_names.append(video_id)
+    # video_names = anno["split"]["epic_kitchen"][split]
+    # video_names = ["P01_03"]
+
     for video_name in video_names:
         print('Testing for video {}'.format(video_name), flush=True)
         cfg.data.test.video_name = video_name
@@ -258,6 +268,13 @@ def main():
                  outputs=outputs,
                  classes=dataset_single_video.CLASSES,
                  save_root=save_root)
+
+        # Prevent RAM leaks, OOM (suggested by Gemini)
+        del outputs
+        del dataset_single_video
+        del data_loader
+        gc.collect()
+        torch.cuda.empty_cache()
 
 
 if __name__ == '__main__':

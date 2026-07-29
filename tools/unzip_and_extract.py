@@ -85,6 +85,8 @@ def process_video(video_path, save_root):
 def extract_videos(video_root, save_root, num_processes=10):
     video_root = Path(video_root)
     videos = list(video_root.rglob('*.mp4'))
+    if videos == []:
+        videos = list(video_root.rglob('*.MP4'))
     with Pool(num_processes) as pool:
         pool.starmap(process_video, [(video, save_root) for video in videos])
 
