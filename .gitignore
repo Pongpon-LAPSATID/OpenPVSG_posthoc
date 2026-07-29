@@ -6,6 +6,7 @@ wandb/
 checkpoints/
 notebooks/
 .*
+PVSG_model/
 
 *.png
 *.pickle
