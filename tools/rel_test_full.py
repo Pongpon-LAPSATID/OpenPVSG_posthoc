@@ -32,7 +32,8 @@ model_name = dir_name.split('_')[2]
 
 # model_pth = f'epoch_{args.epoch_id}.pth'
 model_pth = "latest.pth"
-mark = f'{dir_name}_standard'
+# mark = f'{dir_name}_standard'   # change from standard to posthoc to distinguish different evaluation settings
+mark = f'{dir_name}_posthoc'
 
 mark = model_name + '_' + mark + '_' + model_pth.split('.')[0]
 work_dir = f'./work_dirs/{ps_type}_{split}_save_qf'

@@ -16,7 +16,7 @@ CPUS_PER_TASK=${CPUS_PER_TASK:-5}
 #     python tools/rel_test_full.py --launcher="slurm" ${PY_ARGS}
 
 PS_TYPE=ips
-MODEL_NAME=conv
+MODEL_NAME=vanilla
 
 WORK_DIR=work_dirs/relation/rel_${PS_TYPE}_${MODEL_NAME}
 
