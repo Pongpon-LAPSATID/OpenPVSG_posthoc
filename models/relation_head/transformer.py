@@ -8,6 +8,8 @@ class TemporalTransformer(nn.Module):
     def __init__(self,
                  input_dim=512,
                  num_relations=57,
+                 rel_freq=None,
+                 tau=1.0,
                  num_transformer_layers=1,
                  dropout_rate=0.1):
         super(TemporalTransformer, self).__init__()
@@ -32,6 +34,26 @@ class TemporalTransformer(nn.Module):
         self.span_head = nn.Linear(input_dim // 4, num_relations)
         self.pred_head = nn.Linear(input_dim // 4, num_relations)
 
+        # prepare the log_prior values (i.e., the relative frequencies of the relations)
+        self.tau = tau
+
+        if rel_freq is not None:
+            # 1. Align dictionary values with class indices [0 .. num_relations-1]
+            raw_counts = [rel_freq.get(str(i), rel_freq.get(i, 0)) for i in range(num_relations)]
+            class_counts = torch.tensor(raw_counts, dtype=torch.float32)
+            
+            # 2. Compute probabilities (pi)
+            freq_sum = class_counts.sum()
+            priors = class_counts / freq_sum
+            
+            # 3. Compute log-priors safely
+            log_priors = torch.log(priors + 1e-12)
+
+            # 4. Register buffer so it moves to GPU automatically
+            self.register_buffer("log_priors", log_priors, persistent=False)
+        else:
+            self.log_priors = None  # Assign None directly instead of register_buffer
+
     def forward(self, x):
         # Assuming x is of shape [batch_size, seq_length, input_dim]
         # Transformer expects input of shape [seq_length, batch_size, input_dim]
@@ -51,6 +73,11 @@ class TemporalTransformer(nn.Module):
 
         span_pred = self.span_head(sequence_output)
         relation_pred = self.pred_head(sequence_output)
+
+        # apply the logit adjustment based on the relative frequencies of the relations
+        if self.log_priors is not None:
+            relation_pred = relation_pred - (self.tau * self.log_priors)
+
         relation_pred = torch.max(relation_pred, dim=1).values
 
         return span_pred, relation_pred

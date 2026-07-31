@@ -16,11 +16,14 @@ CPUS_PER_TASK=${CPUS_PER_TASK:-5}
 #     python tools/rel_test_full.py --launcher="slurm" ${PY_ARGS}
 
 PS_TYPE=ips
-MODEL_NAME=vanilla
+MODEL_NAME=transformer
+REL_FREQ_PATH=data/relation_class_index_frequency.json
+TAU=0.15
 
 WORK_DIR=work_dirs/relation/rel_${PS_TYPE}_${MODEL_NAME}
 
 PYTHONPATH="$(pwd):$PYTHONPATH" \
 # python tools/rel_test_full.py --launcher="none" ${PY_ARGS}
 python tools/rel_test_full.py \
-    --work-dir ${WORK_DIR}
+    --work-dir ${WORK_DIR} --rel-freq-path ${REL_FREQ_PATH} \
+    --tau ${TAU}

@@ -1,3 +1,5 @@
+import json
+
 import torch, os, argparse
 import numpy as np
 from torch.utils.data import DataLoader
@@ -18,7 +20,20 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 parser = argparse.ArgumentParser(description='prepare relation set')
 parser.add_argument('--work-dir', help='vanilla, filter, conv, transformer')
 parser.add_argument('--epoch-id', type=int, default='100')
+parser.add_argument('--rel-freq-path', type=str, default=None, help='path to relation class frequency json file')
+parser.add_argument('--tau', type=float, default=1.0, help='temperature for logit adjustment')
 args = parser.parse_args()
+
+# prepare the log_prior values (i.e., the relative frequencies of the relations)
+## First, load the relation class frequency.json, obtained from .ipynb script
+rel_freq_path = args.rel_freq_path
+if rel_freq_path is not None and os.path.exists(rel_freq_path):
+    with open(rel_freq_path, 'r') as f:
+        rel_freq = json.load(f)
+else:
+    rel_freq = None
+
+tau = args.tau
 
 # Initialize the dataset and dataloader
 data_dir = './data/'
@@ -32,8 +47,8 @@ model_name = dir_name.split('_')[2]
 
 # model_pth = f'epoch_{args.epoch_id}.pth'
 model_pth = "latest.pth"
-# mark = f'{dir_name}_standard'   # change from standard to posthoc to distinguish different evaluation settings
-mark = f'{dir_name}_posthoc'
+# mark = f'{dir_name}_standard'
+mark = f'{dir_name}_posthoc_t{str(tau).split(".")[0]}{str(tau).split(".")[1]}'  # change from standard to posthoc to distinguish different evaluation settings
 
 mark = model_name + '_' + mark + '_' + model_pth.split('.')[0]
 work_dir = f'./work_dirs/{ps_type}_{split}_save_qf'
@@ -59,7 +74,8 @@ hidden_dim = 1024
 input_dim = 512
 
 # for dataset
-num_relations = 57
+# num_relations = 57
+num_relations = len(rel_freq) if rel_freq is not None else 57  # must equal to len(rel_freq)
 num_top_pairs = 100
 max_frame_length = 900
 
@@ -87,7 +103,9 @@ model_classes = {
 }
 if model_name in model_classes:
     relation_model = model_classes[model_name](input_dim,
-                                               num_relations).to(device)
+                                               num_relations,
+                                               rel_freq,
+                                               tau).to(device)
 else:
     raise ValueError(f'Model {model_name} is unsupported')
 
