@@ -23,7 +23,7 @@ sh scripts/train/train_relation.sh
 / Test
 sh scripts/test/test_relation_full.sh
 
-**References:**
+**References:** <br>
 [1] A. K. Menon, S. Jayasumana, A. S. Rawat, H. Jain, A. Veit, and S. Kumar, “Long-tail learning via logit adjustment,” Oct. 2020. Accessed: July 31, 2026. [Online]. Available: https://openreview.net/forum?id=37nvvqkCo5.<br>
 [2] J. Yang et al., "Panoptic Video Scene Graph Generation," 2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), Vancouver, BC, Canada, 2023, pp. 18675-18685, doi: 10.1109/CVPR52729.2023.01791.
 
