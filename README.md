@@ -1,4 +1,33 @@
-# Panoptic Video Scene Graph Generation
+# About This Repo
+This repo contains my experiment adding the post-hoc logit adjustment operations [1] to the panoptic video scene graph generation framework [2] to mitigate long-tailed distribution bias in the training set.
+
+This repo is a deliverable for my final assignment in the "4840-1014 Visual Media" coursework (2026 S1/S2 semester), provided by the Graduate School of Information Science and Technology, The University of Tokyo.
+
+**Environment:**
+Hardware: CP-VELUGA G3 RTX A5000 (DualBoot) Laptop
+OS: Ubuntu20.04LTS
+CPU: Core i7 11800H 8core/16thread 2.3GHz (TurboBoost 4.6GHz)
+Memory: 32 GB (16GB x2) GPU: NVIDIA RTX A5000 Laptop 16GB GDDR6
+
+**Implementation Steps:**
+1. Follow the guidelines from the original PVSG paper [2] below to download the dataset and pre-trained models. 
+2. My implementation did not include the videos from "EpicKitchen" dataset. To follow my steps, download the .json files from this URL and put them under the data/ folder: https://drive.google.com/drive/folders/15aHa414H1cllMz2VvYP3xKLKN30vXXhU?usp=sharing
+Note: main_results.csv in the URL recorded the results from my implementation. I provided this as a reference only.
+3. Run the scripts below. Adjust the relative paths and other variable names in .sh and .py scripts as necessary to run the test scripts.
+/ Tracking and save query features
+sh scripts/utils/prepare_qf_ips.sh
+/ Prepare for relation modeling
+sh scripts/utils/prepare_rel_set.sh
+/ Train relation models
+sh scripts/train/train_relation.sh
+/ Test
+sh scripts/test/test_relation_full.sh
+
+**References:**
+[1] A. K. Menon, S. Jayasumana, A. S. Rawat, H. Jain, A. Veit, and S. Kumar, “Long-tail learning via logit adjustment,” Oct. 2020. Accessed: July 31, 2026. [Online]. Available: https://openreview.net/forum?id=37nvvqkCo5
+[2] J. Yang et al., "Panoptic Video Scene Graph Generation," 2023 IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR), Vancouver, BC, Canada, 2023, pp. 18675-18685, doi: 10.1109/CVPR52729.2023.01791.
+
+# [README from Original PVSG Paper] Panoptic Video Scene Graph Generation
 <p align="center">
   <!-- <img src="./assets/psgtr_long.gif" align="center" width="80%"> -->
 
